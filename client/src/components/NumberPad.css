@@ -1,0 +1,109 @@
+.numpad {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  width: min(90vw, 480px);
+}
+
+.numpad-controls {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  justify-content: center;
+}
+
+.ctrl-btn {
+  flex: 1;
+  max-width: 110px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 8px;
+  background: #fff;
+  border: 1.5px solid #dde3ef;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #344861;
+  transition: all .15s;
+}
+
+.ctrl-btn:hover {
+  background: #f0f4ff;
+  border-color: #b0c4de;
+}
+
+.ctrl-btn svg {
+  color: #7b9bb8;
+}
+
+.ctrl-active {
+  background: #eef3ff !important;
+  border-color: #325aaf !important;
+  color: #325aaf !important;
+}
+
+.ctrl-active svg {
+  color: #325aaf !important;
+}
+
+.numpad-numbers {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  justify-content: center;
+}
+
+.num-btn {
+  flex: 1;
+  aspect-ratio: 1;
+  max-width: 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  border: 1.5px solid #dde3ef;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all .15s;
+  padding: 0;
+  position: relative;
+}
+
+.num-btn:hover:not(:disabled) {
+  background: #eef3ff;
+  border-color: #325aaf;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(50,90,175,.15);
+}
+
+.num-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.num-btn-done {
+  opacity: .3;
+}
+
+.num-btn:disabled {
+  cursor: default;
+}
+
+.num-btn-digit {
+  font-size: 22px;
+  font-weight: 800;
+  color: #344861;
+  line-height: 1;
+}
+
+.num-btn-remaining {
+  font-size: 9px;
+  font-weight: 700;
+  color: #7b9bb8;
+  position: absolute;
+  bottom: 3px;
+  right: 5px;
+}

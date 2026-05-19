@@ -1,0 +1,63 @@
+.gameover {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+  padding: 40px 16px;
+}
+
+.gameover-card {
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 8px 40px rgba(52,72,97,.14);
+  padding: 48px 40px;
+  max-width: 360px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  text-align: center;
+}
+
+.gameover-emoji {
+  font-size: 64px;
+  line-height: 1;
+  animation: pop .4s cubic-bezier(.175,.885,.32,1.275);
+}
+
+@keyframes pop {
+  from { transform: scale(0); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.gameover-title {
+  font-size: 24px;
+  font-weight: 800;
+  color: #344861;
+}
+
+.gameover-desc {
+  font-size: 15px;
+  color: #7b9bb8;
+  line-height: 1.5;
+}
+
+.primary-btn {
+  width: 100%;
+  background: #325aaf;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 14px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  margin-top: 8px;
+  transition: background .15s;
+}
+
+.primary-btn:hover {
+  background: #264b96;
+}
