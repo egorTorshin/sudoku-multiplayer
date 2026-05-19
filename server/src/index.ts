@@ -34,7 +34,19 @@ function getOpponentId(room: Room, myId: string): string | undefined {
 io.on('connection', (socket) => {
   console.log('connect', socket.id);
 
+  function leaveAllRooms() {
+    for (const [roomId, room] of rooms.entries()) {
+      if (room.players.has(socket.id)) {
+        room.players.delete(socket.id);
+        socket.to(roomId).emit('opponent_disconnected');
+        socket.leave(roomId);
+        if (room.players.size === 0) rooms.delete(roomId);
+      }
+    }
+  }
+
   socket.on('create_room', ({ difficulty }: { difficulty: string }) => {
+    leaveAllRooms();
     const { puzzle, solution } = generateSudoku(difficulty || 'medium');
     const totalEmpty = countEmpty(puzzle);
     let roomId = generateRoomId();
@@ -54,6 +66,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('create_custom_room', ({ givenCells }: { givenCells: number[][] }) => {
+    leaveAllRooms();
     if (!validatePartialPuzzle(givenCells)) {
       socket.emit('puzzle_error', { message: 'Неверная конфигурация — числа конфликтуют' });
       return;
@@ -87,6 +100,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('join_room', ({ roomId }: { roomId: string }) => {
+    leaveAllRooms();
     const id = roomId.toUpperCase().trim();
     const room = rooms.get(id);
     if (!room) {
@@ -155,12 +169,14 @@ io.on('connection', (socket) => {
     if (!correct && mistakes >= 3) {
       socket.emit('game_over', { winner: 'opponent', reason: 'mistakes' });
       if (opId) io.to(opId).emit('game_over', { winner: 'you', reason: 'opponent_mistakes' });
+      rooms.delete(room.id);
       return;
     }
 
     if (correct && solved === room.totalEmpty) {
       socket.emit('game_over', { winner: 'you' });
       if (opId) io.to(opId).emit('game_over', { winner: 'opponent' });
+      rooms.delete(room.id);
     }
   });
 
