@@ -110,6 +110,7 @@ io.on('connection', (socket) => {
     const opponentSolved = hostId !== socket.id ? (hostState?.correctCells.size ?? 0) : 0;
 
     socket.emit('room_joined', {
+      roomId: id,
       puzzle: room.puzzle,
       totalEmpty: room.totalEmpty,
       opponentSolved,
@@ -118,8 +119,14 @@ io.on('connection', (socket) => {
     socket.to(id).emit('opponent_joined', { opponentSolved: 0 });
   });
 
-  socket.on('check_cell', ({ roomId, row, col, value }: { roomId: string; row: number; col: number; value: number }) => {
-    const room = rooms.get(roomId);
+  function getRoomForSocket(): Room | undefined {
+    for (const room of rooms.values()) {
+      if (room.players.has(socket.id)) return room;
+    }
+  }
+
+  socket.on('check_cell', ({ row, col, value }: { row: number; col: number; value: number }) => {
+    const room = getRoomForSocket();
     if (!room) return;
     const player = room.players.get(socket.id);
     if (!player) return;
@@ -148,8 +155,8 @@ io.on('connection', (socket) => {
     }
   });
 
-  socket.on('erase_cell', ({ roomId, row, col }: { roomId: string; row: number; col: number }) => {
-    const room = rooms.get(roomId);
+  socket.on('erase_cell', ({ row, col }: { row: number; col: number }) => {
+    const room = getRoomForSocket();
     if (!room) return;
     const player = room.players.get(socket.id);
     if (!player) return;

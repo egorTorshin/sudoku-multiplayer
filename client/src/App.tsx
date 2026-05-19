@@ -43,9 +43,9 @@ export default function App() {
       setPhase('waiting');
     });
 
-    socket.on('room_joined', ({ puzzle, totalEmpty, opponentSolved }) => {
+    socket.on('room_joined', ({ roomId, puzzle, totalEmpty, opponentSolved }) => {
       setGameState({
-        roomId: '',
+        roomId,
         puzzle,
         board: (puzzle as number[][]).map((r: number[]) => [...r]),
         cellStatus: makeStatusGrid(puzzle),
@@ -109,7 +109,7 @@ export default function App() {
     if (value === 0) {
       const prevStatus = gameState.cellStatus[row][col];
       const wasCorrect = prevStatus === 'correct';
-      socket.emit('erase_cell', { roomId: gameState.roomId, row, col });
+      socket.emit('erase_cell', { row, col });
       setGameState(prev => {
         if (!prev) return prev;
         const board = prev.board.map(r => [...r]);
@@ -136,7 +136,7 @@ export default function App() {
       return { ...prev, board };
     });
 
-    socket.emit('check_cell', { roomId: gameState.roomId, row, col, value });
+    socket.emit('check_cell', { row, col, value });
   }, [gameState]);
 
   const handleNoteToggle = useCallback((row: number, col: number, num: number) => {
