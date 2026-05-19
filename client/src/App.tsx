@@ -24,6 +24,7 @@ export default function App() {
   const [phase, setPhase] = useState<GamePhase>('lobby');
   const [gameState, setGameState] = useState<GameState | null>(null);
   const [winner, setWinner] = useState<'you' | 'opponent' | null>(null);
+  const [gameOverReason, setGameOverReason] = useState<string | undefined>();
   const [error, setError] = useState<string>('');
 
   useEffect(() => {
@@ -37,7 +38,9 @@ export default function App() {
         cellStatus: makeStatusGrid(puzzle),
         totalEmpty,
         mySolved: 0,
+        myMistakes: 0,
         opponentSolved: 0,
+        opponentMistakes: 0,
         notes: makeNotes(),
       });
       setPhase('waiting');
@@ -51,7 +54,9 @@ export default function App() {
         cellStatus: makeStatusGrid(puzzle),
         totalEmpty,
         mySolved: 0,
+        myMistakes: 0,
         opponentSolved,
+        opponentMistakes: 0,
         notes: makeNotes(),
       });
       setPhase('playing');
@@ -62,21 +67,27 @@ export default function App() {
       setPhase('playing');
     });
 
-    socket.on('opponent_progress', ({ solved }) => {
-      setGameState(prev => prev ? { ...prev, opponentSolved: solved } : prev);
+    socket.on('opponent_progress', ({ solved, mistakes }) => {
+      setGameState(prev => prev ? { ...prev, opponentSolved: solved, opponentMistakes: mistakes ?? prev.opponentMistakes } : prev);
     });
 
-    socket.on('cell_result', ({ row, col, correct, solved }) => {
+    socket.on('cell_result', ({ row, col, correct, solved, mistakes }) => {
       setGameState(prev => {
         if (!prev) return prev;
         const newStatus = prev.cellStatus.map((r: CellStatus[]) => [...r]) as CellStatus[][];
         newStatus[row][col] = correct ? 'correct' : 'wrong';
-        return { ...prev, cellStatus: newStatus, mySolved: solved ?? prev.mySolved };
+        return {
+          ...prev,
+          cellStatus: newStatus,
+          mySolved: solved ?? prev.mySolved,
+          myMistakes: mistakes ?? prev.myMistakes,
+        };
       });
     });
 
-    socket.on('game_over', ({ winner }) => {
+    socket.on('game_over', ({ winner, reason }) => {
       setWinner(winner);
+      setGameOverReason(reason);
       setPhase('gameover');
     });
 
@@ -156,6 +167,7 @@ export default function App() {
     setPhase('lobby');
     setGameState(null);
     setWinner(null);
+    setGameOverReason(undefined);
     setError('');
   }, []);
 
@@ -198,7 +210,7 @@ export default function App() {
         />
       )}
       {phase === 'gameover' && (
-        <GameOver winner={winner} onBack={backToLobby} />
+        <GameOver winner={winner} reason={gameOverReason} onBack={backToLobby} />
       )}
     </div>
   );

@@ -1,6 +1,7 @@
 export interface PlayerState {
   socketId: string;
   correctCells: Set<string>;
+  mistakes: number;
 }
 
 export interface Room {

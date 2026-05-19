@@ -45,7 +45,7 @@ io.on('connection', (socket) => {
       puzzle,
       solution,
       totalEmpty,
-      players: new Map([[socket.id, { socketId: socket.id, correctCells: new Set() }]]),
+      players: new Map([[socket.id, { socketId: socket.id, correctCells: new Set(), mistakes: 0 }]]),
       isCustom: false,
     });
 
@@ -78,7 +78,7 @@ io.on('connection', (socket) => {
       puzzle: givenCells,
       solution,
       totalEmpty,
-      players: new Map([[socket.id, { socketId: socket.id, correctCells: new Set() }]]),
+      players: new Map([[socket.id, { socketId: socket.id, correctCells: new Set(), mistakes: 0 }]]),
       isCustom: true,
     });
 
@@ -102,7 +102,7 @@ io.on('connection', (socket) => {
       return;
     }
 
-    room.players.set(socket.id, { socketId: socket.id, correctCells: new Set() });
+    room.players.set(socket.id, { socketId: socket.id, correctCells: new Set(), mistakes: 0 });
     socket.join(id);
 
     const [hostId] = room.players.keys();
@@ -139,14 +139,23 @@ io.on('connection', (socket) => {
       player.correctCells.add(key);
     } else {
       player.correctCells.delete(key);
+      player.mistakes++;
     }
 
     const solved = player.correctCells.size;
-    socket.emit('cell_result', { row, col, correct, solved, total: room.totalEmpty });
-
+    const { mistakes } = player;
     const opId = getOpponentId(room, socket.id);
+
+    socket.emit('cell_result', { row, col, correct, solved, mistakes, total: room.totalEmpty });
+
     if (opId) {
-      io.to(opId).emit('opponent_progress', { solved, total: room.totalEmpty });
+      io.to(opId).emit('opponent_progress', { solved, mistakes, total: room.totalEmpty });
+    }
+
+    if (!correct && mistakes >= 3) {
+      socket.emit('game_over', { winner: 'opponent', reason: 'mistakes' });
+      if (opId) io.to(opId).emit('game_over', { winner: 'you', reason: 'opponent_mistakes' });
+      return;
     }
 
     if (correct && solved === room.totalEmpty) {

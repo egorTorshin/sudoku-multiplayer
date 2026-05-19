@@ -118,3 +118,24 @@
   font-weight: 800;
   color: #bec6d4;
 }
+
+.lives {
+  display: flex;
+  gap: 3px;
+  margin-top: 2px;
+}
+
+.life {
+  font-size: 14px;
+  color: #325aaf;
+  transition: color .2s, transform .2s;
+}
+
+.life.opp {
+  color: #e55252;
+}
+
+.life.lost {
+  color: #dde3ef;
+  transform: scale(.85);
+}

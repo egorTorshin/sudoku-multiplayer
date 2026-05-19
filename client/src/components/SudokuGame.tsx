@@ -35,7 +35,7 @@ export default function SudokuGame({ gameState, onCellInput, onNoteToggle, onBac
   const history = useRef<HistoryEntry[]>([]);
   const timer = useTimer();
 
-  const { board, puzzle, cellStatus, notes, mySolved, opponentSolved, totalEmpty } = gameState;
+  const { board, puzzle, cellStatus, notes, mySolved, myMistakes, opponentSolved, opponentMistakes, totalEmpty } = gameState;
 
   const remaining = Array(10).fill(0);
   for (let r = 0; r < 9; r++) {
@@ -119,6 +119,11 @@ export default function SudokuGame({ gameState, onCellInput, onNoteToggle, onBac
           <div className="progress-bar-track">
             <div className="progress-bar-fill you" style={{ width: `${myPct}%` }} />
           </div>
+          <div className="lives">
+            {[0,1,2].map(i => (
+              <span key={i} className={i < 3 - myMistakes ? 'life' : 'life lost'}>♥</span>
+            ))}
+          </div>
         </div>
         <div className="progress-vs">VS</div>
         <div className="progress-player">
@@ -128,6 +133,11 @@ export default function SudokuGame({ gameState, onCellInput, onNoteToggle, onBac
           </div>
           <div className="progress-bar-track">
             <div className="progress-bar-fill opp" style={{ width: `${opPct}%` }} />
+          </div>
+          <div className="lives">
+            {[0,1,2].map(i => (
+              <span key={i} className={i < 3 - opponentMistakes ? 'life opp' : 'life lost'}>♥</span>
+            ))}
           </div>
         </div>
       </div>

@@ -7,7 +7,9 @@ export interface GameState {
   cellStatus: CellStatus[][];
   totalEmpty: number;
   mySolved: number;
+  myMistakes: number;
   opponentSolved: number;
+  opponentMistakes: number;
   notes: Set<number>[][];
 }
 
